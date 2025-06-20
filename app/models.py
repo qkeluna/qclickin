@@ -129,21 +129,19 @@ class Team(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    slug = Column(String, unique=True, nullable=False)
+    slug = Column(String)  # Not unique in database
     logo = Column(String)
     bio = Column(Text)
     hideBranding = Column(Boolean, default=False)
     team_metadata = Column("metadata", JSONB, default={})
-    createdDate = Column(DateTime, default=func.now())
 
 class Organization(Base):
     __tablename__ = "organizations"
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    slug = Column(String, unique=True, nullable=False)
+    slug = Column(String)  # Not unique in database
     org_metadata = Column("metadata", JSONB, default={})
-    createdDate = Column(DateTime, default=func.now())
 
 class Membership(Base):
     __tablename__ = "memberships"
@@ -261,7 +259,6 @@ class TeamCreate(TeamBase):
 
 class TeamResponse(TeamBase):
     id: int
-    createdDate: datetime
     
     class Config:
         from_attributes = True
@@ -276,7 +273,6 @@ class OrganizationCreate(OrganizationBase):
 
 class OrganizationResponse(OrganizationBase):
     id: int
-    createdDate: datetime
     
     class Config:
         from_attributes = True
