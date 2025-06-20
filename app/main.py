@@ -101,49 +101,69 @@ async def debug_info():
 @app.post("/auth/register", response_model=UserResponse)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     """Register a new user account"""
+    print(f"📝 Registration attempt for: {user.email}")
+    
     # Check if user exists
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user:
+        print(f"❌ Email already registered: {user.email}")
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Check username if provided
     if user.username:
         db_username = db.query(User).filter(User.username == user.username).first()
         if db_username:
+            print(f"❌ Username already taken: {user.username}")
             raise HTTPException(status_code=400, detail="Username already taken")
     
-    # Create user
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        username=user.username,
-        name=user.name,
-        bio=user.bio,
-        timeZone=user.timeZone,
-        locale=user.locale,
-        theme=user.theme
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    # Create password record
-    db_password = UserPassword(hash=hashed_password, userId=db_user.id)
-    db.add(db_password)
-    db.commit()
-    
-    return db_user
+    try:
+        # Create user
+        hashed_password = get_password_hash(user.password)
+        db_user = User(
+            email=user.email,
+            username=user.username,
+            name=user.name,
+            bio=user.bio,
+            timeZone=user.timeZone,
+            locale=user.locale,
+            theme=user.theme
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        
+        # Create password record
+        db_password = UserPassword(hash=hashed_password, userId=db_user.id)
+        db.add(db_password)
+        db.commit()
+        
+        print(f"✅ User registered successfully: {user.email}")
+        return db_user
+        
+    except Exception as e:
+        print(f"❌ Registration failed for {user.email}: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Registration failed. Please try again.")
 
 @app.post("/auth/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Authenticate user and return access token"""
+    print(f"🔐 Login attempt for: {form_data.username}")
+    
     user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not user.passwords:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    if not user:
+        print(f"❌ User not found: {form_data.username}")
+        raise HTTPException(status_code=400, detail="User not found. Please register first.")
+    
+    if not user.passwords:
+        print(f"❌ No password record for user: {form_data.username}")
+        raise HTTPException(status_code=400, detail="Account setup incomplete. Please contact support.")
     
     if not verify_password(form_data.password, user.passwords.hash):
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        print(f"❌ Password verification failed for: {form_data.username}")
+        raise HTTPException(status_code=400, detail="Incorrect password")
     
+    print(f"✅ Login successful for: {form_data.username}")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
