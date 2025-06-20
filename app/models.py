@@ -133,7 +133,7 @@ class Team(Base):
     logo = Column(String)
     bio = Column(Text)
     hideBranding = Column(Boolean, default=False)
-    metadata = Column(JSONB, default={})
+    team_metadata = Column("metadata", JSONB, default={})
     createdDate = Column(DateTime, default=func.now())
 
 class Organization(Base):
@@ -142,7 +142,7 @@ class Organization(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     slug = Column(String, unique=True, nullable=False)
-    metadata = Column(JSONB, default={})
+    org_metadata = Column("metadata", JSONB, default={})
     createdDate = Column(DateTime, default=func.now())
 
 class Membership(Base):
