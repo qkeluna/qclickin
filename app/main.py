@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import List
 from .database import get_db, engine
 from .models import *
@@ -50,8 +50,35 @@ async def root():
     return {"message": "Welcome to QClickIn Scheduling Platform API"}
 
 @app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "qclickin-api"}
+async def health_check(db: Session = Depends(get_db)):
+    """Comprehensive health check with database connectivity test"""
+    try:
+        # Test database connection
+        db.execute("SELECT 1")
+        return {
+            "status": "healthy", 
+            "service": "qclickin-api",
+            "timestamp": datetime.utcnow().isoformat(),
+            "database": "connected",
+            "version": "1.0.0"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=503, 
+            detail={
+                "status": "unhealthy", 
+                "service": "qclickin-api", 
+                "error": "Database connection failed",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        )
+
+# Temporary aliases for leapcell.io health check (fix deployment config!)
+@app.get("/kaithhealthcheck")
+@app.get("/kaithheathcheck") 
+async def health_check_alias():
+    """Temporary alias for misspelled health check URLs from leapcell.io"""
+    return {"status": "healthy", "service": "qclickin-api", "note": "Fix deployment config to use /health"}
 
 # Auth endpoints
 @app.post("/auth/register", response_model=UserResponse)
