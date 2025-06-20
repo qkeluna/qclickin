@@ -31,9 +31,10 @@ def create_env_file():
     choice = input("Select database option (1-4) [default: 1]: ").strip() or "1"
     
     if choice == "1":
-        # Xata configuration from your docs
-        database_url = "https://Khyle-Erick-Luna-s-workspace-8g1h14.us-east-1.xata.sh/db/qclickin-db:main"
-        xata_api_key = "xau_KQgFhYNVwXuFLtPiryNdbmuQPYvQApTV6"
+        # Xata configuration - enter your credentials
+        print("⚠️  Enter your Xata credentials:")
+        database_url = input("Xata Database URL: ")
+        xata_api_key = input("Xata API Key: ")
     elif choice == "2":
         database_url = "sqlite:///./qclickin.db"
         xata_api_key = ""
