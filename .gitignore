@@ -1,0 +1,305 @@
+# ============================================================================
+# Python
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================================================
+# Virtual Environments
+# ============================================================================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+pyvenv.cfg
+
+# ============================================================================
+# Environment Variables & Secrets
+# ============================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+.envrc
+
+# API Keys and Secrets
+*.key
+*.pem
+*.p12
+secrets/
+config/secrets/
+
+# ============================================================================
+# Database
+# ============================================================================
+*.db
+*.sqlite
+*.sqlite3
+database.db
+test.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Database backups
+*.sql
+*.dump
+*.backup
+
+# Migration files (keep structure, ignore data)
+migrations/data/
+alembic/versions/*.pyc
+
+# ============================================================================
+# Testing
+# ============================================================================
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+htmlcov/
+.testmondata
+test_*.db
+
+# ============================================================================
+# Jupyter Notebook
+# ============================================================================
+.ipynb_checkpoints
+
+# ============================================================================
+# IPython
+# ============================================================================
+profile_default/
+ipython_config.py
+
+# ============================================================================
+# FastAPI/Web Development
+# ============================================================================
+# Static files
+static/
+media/
+uploads/
+public/uploads/
+
+# Session files
+session/
+sessions/
+
+# Log files
+*.log
+logs/
+log/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# ============================================================================
+# IDE/Editor Files
+# ============================================================================
+# Visual Studio Code
+.vscode/
+.cursor/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+
+# ============================================================================
+# Deployment & Production
+# ============================================================================
+# Docker
+.dockerignore
+Dockerfile.prod
+
+# SSL Certificates
+*.crt
+*.key
+*.pem
+ssl/
+certs/
+
+# Production configuration
+prod.env
+production.env
+staging.env
+
+# Process files
+*.pid
+*.sock
+
+# ============================================================================
+# Cloud & Infrastructure
+# ============================================================================
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS
+.aws/
+aws-exports.js
+
+# Google Cloud
+.gcloud/
+gcloud-service-key.json
+
+# Heroku
+.heroku/
+
+# Vercel
+.vercel/
+
+# Railway
+.railway/
+
+# ============================================================================
+# Monitoring & Analytics
+# ============================================================================
+# New Relic
+newrelic.ini
+
+# Sentry
+.sentryclirc
+
+# ============================================================================
+# Performance & Profiling
+# ============================================================================
+.prof
+.profile
+
+# ============================================================================
+# Package Managers
+# ============================================================================
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# poetry
+poetry.lock
+dist-poetry/
+
+# pipenv
+Pipfile.lock
+
+# ============================================================================
+# CI/CD
+# ============================================================================
+.github/workflows/*.disabled
+.gitlab-ci.local.yml
+
+# ============================================================================
+# Backup Files
+# ============================================================================
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+
+# ============================================================================
+# Documentation
+# ============================================================================
+docs/_build/
+docs/build/
+docs/site/
+
+# ============================================================================
+# Custom Application Files
+# ============================================================================
+# QClickIn specific
+uploads/
+user_avatars/
+event_images/
+booking_attachments/
+
+# Cache directories
+.cache/
+cache/
+
+# Custom logs
+app.log
+error.log
+access.log
+debug.log 
