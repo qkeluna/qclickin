@@ -19,7 +19,11 @@ from .endpoints import (
 import uuid
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✅ Database tables initialized")
+except Exception as e:
+    print(f"⚠️ Database initialization warning: {e}")
 
 app = FastAPI(
     title="QClickIn - Scheduling Platform", 
