@@ -40,8 +40,8 @@ async def create_team(
     
     # Create membership for team creator as OWNER
     membership = Membership(
-        teamId=db_team.id,
-        userId=current_user.id,
+        team_id=db_team.id,
+        user_id=current_user.id,
         accepted=True,
         role="OWNER"
     )
@@ -57,7 +57,7 @@ async def get_user_teams(
 ):
     """Get teams user belongs to"""
     teams = db.query(Team).join(Membership).filter(
-        Membership.userId == current_user.id,
+        Membership.user_id == current_user.id,
         Membership.accepted == True
     ).all()
     return teams
@@ -71,7 +71,7 @@ async def get_team(
     """Get specific team"""
     team = db.query(Team).join(Membership).filter(
         Team.id == team_id,
-        Membership.userId == current_user.id,
+        Membership.user_id == current_user.id,
         Membership.accepted == True
     ).first()
     if not team:
@@ -88,8 +88,8 @@ async def update_team(
     """Update team details (requires ADMIN or OWNER role)"""
     # Check permission
     membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == current_user.id,
+        Membership.team_id == team_id,
+        Membership.user_id == current_user.id,
         Membership.role.in_(["ADMIN", "OWNER"]),
         Membership.accepted == True
     ).first()
@@ -115,8 +115,8 @@ async def delete_team(
 ):
     """Delete team (requires OWNER role)"""
     membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == current_user.id,
+        Membership.team_id == team_id,
+        Membership.user_id == current_user.id,
         Membership.role == "OWNER",
         Membership.accepted == True
     ).first()
@@ -142,8 +142,8 @@ async def invite_team_member(
     """Invite member to team"""
     # Check permission
     membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == current_user.id,
+        Membership.team_id == team_id,
+        Membership.user_id == current_user.id,
         Membership.role.in_(["ADMIN", "OWNER"]),
         Membership.accepted == True
     ).first()
@@ -157,15 +157,15 @@ async def invite_team_member(
     
     # Check if already member
     existing = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == user.id
+        Membership.team_id == team_id,
+        Membership.user_id == user.id
     ).first()
     if existing:
         raise HTTPException(status_code=400, detail="User is already a team member")
     
     new_membership = Membership(
-        teamId=team_id,
-        userId=user.id,
+        team_id=team_id,
+        user_id=user.id,
         role=invite.role,
         accepted=False  # Requires acceptance
     )
@@ -184,15 +184,15 @@ async def get_team_members(
     """Get team members"""
     # Check if user is team member
     membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == current_user.id,
+        Membership.team_id == team_id,
+        Membership.user_id == current_user.id,
         Membership.accepted == True
     ).first()
     if not membership:
         raise HTTPException(status_code=403, detail="Access denied")
     
     members = db.query(Membership).options(joinedload(Membership.user)).filter(
-        Membership.teamId == team_id,
+        Membership.team_id == team_id,
         Membership.accepted == True
     ).all()
     return members
@@ -208,8 +208,8 @@ async def update_member_role(
     """Update member role"""
     # Check permission
     current_membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == current_user.id,
+        Membership.team_id == team_id,
+        Membership.user_id == current_user.id,
         Membership.role.in_(["ADMIN", "OWNER"]),
         Membership.accepted == True
     ).first()
@@ -217,8 +217,8 @@ async def update_member_role(
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
     target_membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == user_id
+        Membership.team_id == team_id,
+        Membership.user_id == user_id
     ).first()
     if not target_membership:
         raise HTTPException(status_code=404, detail="Membership not found")
@@ -239,8 +239,8 @@ async def remove_team_member(
     # Check permission (ADMIN/OWNER can remove others, users can leave themselves)
     if user_id != current_user.id:
         current_membership = db.query(Membership).filter(
-            Membership.teamId == team_id,
-            Membership.userId == current_user.id,
+            Membership.team_id == team_id,
+            Membership.user_id == current_user.id,
             Membership.role.in_(["ADMIN", "OWNER"]),
             Membership.accepted == True
         ).first()
@@ -248,8 +248,8 @@ async def remove_team_member(
             raise HTTPException(status_code=403, detail="Insufficient permissions")
     
     membership = db.query(Membership).filter(
-        Membership.teamId == team_id,
-        Membership.userId == user_id
+        Membership.team_id == team_id,
+        Membership.user_id == user_id
     ).first()
     if not membership:
         raise HTTPException(status_code=404, detail="Membership not found")
@@ -302,12 +302,12 @@ async def get_booking_attendees(
     """Get booking attendees"""
     booking = db.query(Booking).filter(
         Booking.id == booking_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    attendees = db.query(Attendee).filter(Attendee.bookingId == booking_id).all()
+    attendees = db.query(Attendee).filter(Attendee.booking_id == booking_id).all()
     return attendees
 
 @attendees_router.patch("/{attendee_id}", response_model=AttendeeResponse)
@@ -320,7 +320,7 @@ async def update_attendee(
     """Update attendee information"""
     attendee = db.query(Attendee).join(Booking).filter(
         Attendee.id == attendee_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not attendee:
         raise HTTPException(status_code=404, detail="Attendee not found")
@@ -341,7 +341,7 @@ async def mark_attendee_no_show(
     """Mark attendee as no-show"""
     attendee = db.query(Attendee).join(Booking).filter(
         Attendee.id == attendee_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not attendee:
         raise HTTPException(status_code=404, detail="Attendee not found")
@@ -400,7 +400,7 @@ async def get_available_slots(
         raise HTTPException(status_code=404, detail="User not found")
     
     event_type = db.query(EventType).filter(
-        EventType.userId == user.id,
+        EventType.user_id == user.id,
         EventType.slug == event_slug,
         EventType.hidden == False
     ).first()
@@ -412,7 +412,7 @@ async def get_available_slots(
     end_of_day = datetime.combine(date, datetime.max.time())
     
     existing_bookings = db.query(Booking).filter(
-        Booking.userId == user.id,
+        Booking.user_id == user.id,
         Booking.startTime >= start_of_day,
         Booking.endTime <= end_of_day,
         Booking.status == "ACCEPTED"
@@ -463,7 +463,7 @@ async def reschedule_booking(
     """Reschedule a booking"""
     booking = db.query(Booking).filter(
         Booking.id == booking_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -484,7 +484,7 @@ async def cancel_booking(
     """Cancel a booking"""
     booking = db.query(Booking).filter(
         Booking.id == booking_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -503,7 +503,7 @@ async def get_booking_with_attendees(
     """Get booking with all attendee details"""
     booking = db.query(Booking).options(joinedload(Booking.attendees)).filter(
         Booking.id == booking_id,
-        Booking.userId == current_user.id
+        Booking.user_id == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -526,7 +526,7 @@ async def get_booking_analytics(
     end_datetime = datetime.combine(end_date, datetime.max.time())
     
     bookings = db.query(Booking).filter(
-        Booking.userId == current_user.id,
+        Booking.user_id == current_user.id,
         Booking.startTime >= start_datetime,
         Booking.startTime <= end_datetime
     ).all()
@@ -538,7 +538,7 @@ async def get_booking_analytics(
     
     # Calculate revenue (simplified)
     revenue = sum(
-        db.query(EventType).filter(EventType.id == booking.eventTypeId).first().price / 100
+        db.query(EventType).filter(EventType.id == booking.event_type_id).first().price / 100
         for booking in bookings if booking.status == "ACCEPTED"
     )
     
@@ -558,11 +558,11 @@ async def get_event_type_performance(
     db: Session = Depends(get_db)
 ):
     """Get event type performance metrics"""
-    event_types = db.query(EventType).filter(EventType.userId == current_user.id).all()
+    event_types = db.query(EventType).filter(EventType.user_id == current_user.id).all()
     performance_data = []
     
     for event_type in event_types:
-        bookings = db.query(Booking).filter(Booking.eventTypeId == event_type.id).all()
+        bookings = db.query(Booking).filter(Booking.event_type_id == event_type.id).all()
         total_bookings = len(bookings)
         confirmed_bookings = len([b for b in bookings if b.status == "ACCEPTED"])
         
@@ -590,7 +590,7 @@ async def create_webhook(
     """Create a new webhook"""
     db_webhook = Webhook(
         **webhook.dict(),
-        userId=current_user.id
+        user_id=current_user.id
     )
     db.add(db_webhook)
     db.commit()
@@ -603,7 +603,7 @@ async def get_webhooks(
     db: Session = Depends(get_db)
 ):
     """Get user webhooks"""
-    webhooks = db.query(Webhook).filter(Webhook.userId == current_user.id).all()
+    webhooks = db.query(Webhook).filter(Webhook.user_id == current_user.id).all()
     return webhooks
 
 @webhooks_router.delete("/{webhook_id}")
@@ -615,7 +615,7 @@ async def delete_webhook(
     """Delete a webhook"""
     webhook = db.query(Webhook).filter(
         Webhook.id == webhook_id,
-        Webhook.userId == current_user.id
+        Webhook.user_id == current_user.id
     ).first()
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
