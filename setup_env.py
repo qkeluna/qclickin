@@ -31,10 +31,34 @@ def create_env_file():
     choice = input("Select database option (1-4) [default: 1]: ").strip() or "1"
     
     if choice == "1":
-        # Xata configuration - enter your credentials
-        print("⚠️  Enter your Xata credentials:")
-        database_url = input("Xata Database URL: ")
-        xata_api_key = input("Xata API Key: ")
+# ─── At the top of setup_env.py ────────────────────────────────────────────────
+import os
+import secrets
+import getpass
+from pathlib import Path
+
+# ─── Later, inside the block handling choice == "1" ────────────────────────────
+if choice == "1":
+    # Xata configuration - enter your credentials
+    print("⚠️  Enter your Xata credentials:")
+    print("💡 Press Ctrl+C to cancel and return to menu")
+
+    # Validate database URL
+    while True:
+        database_url = input("Xata Database URL: ").strip()
+        if not database_url:
+            print("❌ Database URL cannot be empty")
+            continue
+        if database_url.startswith(("https://", "http://")):
+            break
+        print("❌ Please enter a valid URL starting with https:// or http://")
+
+    # Securely prompt for the API key
+    while True:
+        xata_api_key = getpass.getpass("Xata API Key (hidden): ").strip()
+        if xata_api_key:
+            break
+        print("❌ API Key cannot be empty")
     elif choice == "2":
         database_url = "sqlite:///./qclickin.db"
         xata_api_key = ""
