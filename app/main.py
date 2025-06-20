@@ -133,7 +133,7 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         db.refresh(db_user)
         
         # Create password record
-        db_password = UserPassword(hash=hashed_password, userId=db_user.id)
+        db_password = UserPassword(hash=hashed_password, user_id=db_user.id)
         db.add(db_password)
         db.commit()
         

@@ -51,7 +51,7 @@ class UserPassword(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     hash = Column(String, nullable=False)
-    userId = Column(Integer, ForeignKey("users.id"), unique=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
     
     # Relationships
     user = relationship("User", back_populates="passwords")
@@ -67,9 +67,9 @@ class EventType(Base):
     length = Column(Integer, nullable=False)  # Duration in minutes
     offsetStart = Column(Integer, default=0)
     hidden = Column(Boolean, default=False)
-    userId = Column(Integer, ForeignKey("users.id"))
-    teamId = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"))
-    organizationId = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    team_id = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"))
+    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
     requiresConfirmation = Column(Boolean, default=False)
     disableGuests = Column(Boolean, default=False)
     minimumBookingNotice = Column(Integer, default=120)  # Minutes
@@ -92,8 +92,8 @@ class Booking(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     uid = Column(String, unique=True, nullable=False)
-    userId = Column(Integer, ForeignKey("users.id"))
-    eventTypeId = Column(Integer, ForeignKey("event_types.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    event_type_id = Column(Integer, ForeignKey("event_types.id"))
     title = Column(String, nullable=False)
     description = Column(Text)
     startTime = Column(DateTime, nullable=False)
@@ -118,7 +118,7 @@ class Attendee(Base):
     timeZone = Column(String, default="UTC")
     locale = Column(String, default="en")
     phoneNumber = Column(String)
-    bookingId = Column(Integer, ForeignKey("bookings.id"))
+    booking_id = Column(Integer, ForeignKey("bookings.id"))
     noShow = Column(Boolean, default=False)
     
     # Relationships
@@ -149,8 +149,8 @@ class Membership(Base):
     __tablename__ = "memberships"
     
     id = Column(Integer, primary_key=True, index=True)
-    teamId = Column(Integer, ForeignKey("teams.id"))
-    userId = Column(Integer, ForeignKey("users.id"))
+    team_id = Column(Integer, ForeignKey("teams.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
     accepted = Column(Boolean, default=False)
     role = Column(String, default="MEMBER")  # MEMBER, ADMIN, OWNER
     
@@ -164,7 +164,7 @@ class Webhook(Base):
     url = Column(String, nullable=False)
     events = Column(JSONB, nullable=False)  # List of event types
     active = Column(Boolean, default=True)
-    userId = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=func.now())
     
     # Relationships
@@ -209,7 +209,7 @@ class EventTypeCreate(EventTypeBase):
 
 class EventTypeResponse(EventTypeBase):
     id: int
-    userId: int
+    user_id: int
     position: int
     
     class Config:
@@ -223,7 +223,7 @@ class BookingBase(BaseModel):
     location: Optional[str] = None
 
 class BookingCreate(BookingBase):
-    eventTypeId: int
+    event_type_id: int
     attendeeEmail: EmailStr
     attendeeName: str
     attendeeTimeZone: str = "UTC"
@@ -231,8 +231,8 @@ class BookingCreate(BookingBase):
 class BookingResponse(BookingBase):
     id: int
     uid: str
-    userId: int
-    eventTypeId: int
+    user_id: int
+    event_type_id: int
     status: str
     
     class Config:
@@ -290,8 +290,8 @@ class MembershipInvite(BaseModel):
 
 class MembershipResponse(BaseModel):
     id: int
-    teamId: int
-    userId: int
+    team_id: int
+    user_id: int
     accepted: bool
     role: str
     user: Optional[UserResponse] = None
@@ -361,7 +361,7 @@ class WebhookCreate(WebhookBase):
 
 class WebhookResponse(WebhookBase):
     id: int
-    userId: int
+    user_id: int
     created_at: datetime
     
     class Config:
