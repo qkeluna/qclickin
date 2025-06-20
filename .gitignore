@@ -302,4 +302,7 @@ cache/
 app.log
 error.log
 access.log
-debug.log 
+debug.log
+
+# Security incident documentation (contains sensitive info)
+SECURITY_INCIDENT_RESPONSE.md 

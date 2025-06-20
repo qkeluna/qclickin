@@ -58,7 +58,7 @@ railway init
 
 # 3. Set environment variables
 railway variables set DATABASE_URL="your-postgres-url"
-railway variables set SECRET_KEY="your-secret-key"
+railway variables set SECRET_KEY="$(openssl rand -hex 32)"
 railway variables set ENVIRONMENT="production"
 
 # 4. Deploy
@@ -93,7 +93,7 @@ heroku create qclickin-api
 heroku addons:create heroku-postgresql:mini
 
 # 3. Set environment variables
-heroku config:set SECRET_KEY="your-secret-key"
+heroku config:set SECRET_KEY="$(openssl rand -hex 32)"
 heroku config:set ENVIRONMENT="production"
 
 # 4. Deploy
@@ -108,7 +108,7 @@ git push heroku main
 # Application
 ENVIRONMENT=production
 DEBUG=False
-SECRET_KEY=your-super-secure-secret-key-here
+SECRET_KEY=generate-secure-key-for-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 

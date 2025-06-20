@@ -43,14 +43,14 @@ A FastAPI-based scheduling platform inspired by Cal.com, built with modern Pytho
    ```
 
 4. **Set up environment variables**:
-   Create a `.env` file in the root directory:
+   Copy the environment template and update with your values:
 
-   ```env
-   DATABASE_URL=postgresql://username:password@localhost/qclickin_dev
-   SECRET_KEY=your_super_secret_key_here_change_in_production
-   ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
+   ```bash
+   cp env.template .env
+   # Edit .env with your actual database URL and generate a secure SECRET_KEY
    ```
+
+   **🔒 Security Note**: Never commit your `.env` file! It's already in `.gitignore`.
 
 5. **Initialize database migrations**:
 
