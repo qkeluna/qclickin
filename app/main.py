@@ -17,6 +17,7 @@ from .endpoints import (
     advanced_bookings_router
 )
 import uuid
+import os
 
 # Create database tables
 try:
@@ -83,6 +84,18 @@ async def health_check(db: Session = Depends(get_db)):
 async def health_check_alias():
     """Temporary alias for misspelled health check URLs from leapcell.io"""
     return {"status": "healthy", "service": "qclickin-api", "note": "Fix deployment config to use /health"}
+
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to check production configuration"""
+    return {
+        "environment": os.getenv("ENVIRONMENT", "not-set"),
+        "database_url_set": bool(os.getenv("DATABASE_URL")),
+        "secret_key_set": bool(os.getenv("SECRET_KEY")),
+        "algorithm": os.getenv("ALGORITHM", "not-set"),
+        "python_version": os.sys.version,
+        "tables_created": "check logs for initialization message"
+    }
 
 # Auth endpoints
 @app.post("/auth/register", response_model=UserResponse)
