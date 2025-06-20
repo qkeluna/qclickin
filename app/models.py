@@ -67,9 +67,9 @@ class EventType(Base):
     length = Column(Integer, nullable=False)  # Duration in minutes
     offsetStart = Column(Integer, default=0)
     hidden = Column(Boolean, default=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    team_id = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"))
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
+    userId = Column(Integer, ForeignKey("users.id"))
+    teamId = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"))
+    organizationId = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
     requiresConfirmation = Column(Boolean, default=False)
     disableGuests = Column(Boolean, default=False)
     minimumBookingNotice = Column(Integer, default=120)  # Minutes
@@ -92,8 +92,8 @@ class Booking(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     uid = Column(String, unique=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    event_type_id = Column(Integer, ForeignKey("event_types.id"))
+    userId = Column(Integer, ForeignKey("users.id"))
+    eventTypeId = Column(Integer, ForeignKey("event_types.id"))
     title = Column(String, nullable=False)
     description = Column(Text)
     startTime = Column(DateTime, nullable=False)
@@ -118,7 +118,7 @@ class Attendee(Base):
     timeZone = Column(String, default="UTC")
     locale = Column(String, default="en")
     phoneNumber = Column(String)
-    booking_id = Column(Integer, ForeignKey("bookings.id"))
+    bookingId = Column(Integer, ForeignKey("bookings.id"))
     noShow = Column(Boolean, default=False)
     
     # Relationships
@@ -133,7 +133,7 @@ class Team(Base):
     logo = Column(String)
     bio = Column(Text)
     hideBranding = Column(Boolean, default=False)
-    team_metadata = Column(JSONB, default={})
+    metadata = Column(JSONB, default={})
     createdDate = Column(DateTime, default=func.now())
 
 class Organization(Base):
@@ -142,7 +142,7 @@ class Organization(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     slug = Column(String, unique=True, nullable=False)
-    org_metadata = Column(JSONB, default={})
+    metadata = Column(JSONB, default={})
     createdDate = Column(DateTime, default=func.now())
 
 class Membership(Base):
@@ -160,12 +160,13 @@ class Membership(Base):
 class Webhook(Base):
     __tablename__ = "webhooks"
     
-    id = Column(Integer, primary_key=True, index=True)
-    url = Column(String, nullable=False)
-    events = Column(JSONB, nullable=False)  # List of event types
+    id = Column(String, primary_key=True)  # Database uses text, not integer
+    subscriber_url = Column(String, nullable=False)
+    event_triggers = Column(JSONB, nullable=False)  # List of event types
     active = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, default=func.now())
+    team_id = Column(Integer, ForeignKey("teams.id"))
+    event_type_id = Column(Integer, ForeignKey("event_types.id"))
     
     # Relationships
     user = relationship("User", back_populates="webhooks")
@@ -209,7 +210,7 @@ class EventTypeCreate(EventTypeBase):
 
 class EventTypeResponse(EventTypeBase):
     id: int
-    user_id: int
+    userId: int
     position: int
     
     class Config:
@@ -223,7 +224,7 @@ class BookingBase(BaseModel):
     location: Optional[str] = None
 
 class BookingCreate(BookingBase):
-    event_type_id: int
+    eventTypeId: int
     attendeeEmail: EmailStr
     attendeeName: str
     attendeeTimeZone: str = "UTC"
@@ -231,8 +232,8 @@ class BookingCreate(BookingBase):
 class BookingResponse(BookingBase):
     id: int
     uid: str
-    user_id: int
-    event_type_id: int
+    userId: int
+    eventTypeId: int
     status: str
     
     class Config:
@@ -352,17 +353,18 @@ class EventTypePerformance(BaseModel):
 
 # Webhook Models
 class WebhookBase(BaseModel):
-    url: str
-    events: List[str]  # booking.created, booking.cancelled, etc.
+    subscriber_url: str
+    event_triggers: List[str]  # booking.created, booking.cancelled, etc.
     active: bool = True
 
 class WebhookCreate(WebhookBase):
     pass
 
 class WebhookResponse(WebhookBase):
-    id: int
-    user_id: int
-    created_at: datetime
+    id: str  # Database uses text ID
+    user_id: Optional[int] = None
+    team_id: Optional[int] = None
+    event_type_id: Optional[int] = None
     
     class Config:
         from_attributes = True 

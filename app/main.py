@@ -200,7 +200,7 @@ async def create_event_type(
     """Create a new event type"""
     # Check if slug is unique for this user
     existing = db.query(EventType).filter(
-        EventType.user_id == current_user.id,
+        EventType.userId == current_user.id,
         EventType.slug == event_type.slug
     ).first()
     if existing:
@@ -208,7 +208,7 @@ async def create_event_type(
     
     db_event_type = EventType(
         **event_type.dict(),
-        user_id=current_user.id
+        userId=current_user.id
     )
     db.add(db_event_type)
     db.commit()
@@ -221,7 +221,7 @@ async def get_event_types(
     db: Session = Depends(get_db)
 ):
     """Get all event types for current user"""
-    return db.query(EventType).filter(EventType.user_id == current_user.id).all()
+    return db.query(EventType).filter(EventType.userId == current_user.id).all()
 
 @app.get("/event-types/{event_type_id}", response_model=EventTypeResponse)
 async def get_event_type(
@@ -232,7 +232,7 @@ async def get_event_type(
     """Get specific event type"""
     event_type = db.query(EventType).filter(
         EventType.id == event_type_id,
-        EventType.user_id == current_user.id
+        EventType.userId == current_user.id
     ).first()
     if not event_type:
         raise HTTPException(status_code=404, detail="Event type not found")
@@ -248,7 +248,7 @@ async def update_event_type(
     """Update event type"""
     event_type = db.query(EventType).filter(
         EventType.id == event_type_id,
-        EventType.user_id == current_user.id
+        EventType.userId == current_user.id
     ).first()
     if not event_type:
         raise HTTPException(status_code=404, detail="Event type not found")
@@ -269,7 +269,7 @@ async def delete_event_type(
     """Delete event type"""
     event_type = db.query(EventType).filter(
         EventType.id == event_type_id,
-        EventType.user_id == current_user.id
+        EventType.userId == current_user.id
     ).first()
     if not event_type:
         raise HTTPException(status_code=404, detail="Event type not found")
@@ -287,7 +287,7 @@ async def get_user_public_profile(username: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     
     event_types = db.query(EventType).filter(
-        EventType.user_id == user.id,
+        EventType.userId == user.id,
         EventType.hidden == False
     ).all()
     
@@ -310,7 +310,7 @@ async def get_public_event_type(username: str, event_slug: str, db: Session = De
         raise HTTPException(status_code=404, detail="User not found")
     
     event_type = db.query(EventType).filter(
-        EventType.user_id == user.id,
+        EventType.userId == user.id,
         EventType.slug == event_slug,
         EventType.hidden == False
     ).first()
@@ -327,7 +327,7 @@ async def create_booking(
 ):
     """Create a new booking (public endpoint)"""
     # Check if event type exists
-    event_type = db.query(EventType).filter(EventType.id == booking.event_type_id).first()
+    event_type = db.query(EventType).filter(EventType.id == booking.eventTypeId).first()
     if not event_type:
         raise HTTPException(status_code=404, detail="Event type not found")
     
@@ -336,7 +336,7 @@ async def create_booking(
     db_booking = Booking(
         uid=booking_uid,
         user_id=event_type.user_id,
-        event_type_id=booking.event_type_id,
+        eventTypeId=booking.eventTypeId,
         title=booking.title,
         description=booking.description,
         startTime=booking.startTime,
@@ -352,7 +352,7 @@ async def create_booking(
         email=booking.attendeeEmail,
         name=booking.attendeeName,
         timeZone=booking.attendeeTimeZone,
-        booking_id=db_booking.id
+        bookingId=db_booking.id
     )
     db.add(db_attendee)
     db.commit()
@@ -365,7 +365,7 @@ async def get_bookings(
     db: Session = Depends(get_db)
 ):
     """Get all bookings for current user"""
-    return db.query(Booking).filter(Booking.user_id == current_user.id).all()
+    return db.query(Booking).filter(Booking.userId == current_user.id).all()
 
 @app.get("/bookings/{booking_id}", response_model=BookingResponse)
 async def get_booking(
@@ -376,7 +376,7 @@ async def get_booking(
     """Get specific booking"""
     booking = db.query(Booking).filter(
         Booking.id == booking_id,
-        Booking.user_id == current_user.id
+        Booking.userId == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -395,7 +395,7 @@ async def update_booking_status(
     
     booking = db.query(Booking).filter(
         Booking.id == booking_id,
-        Booking.user_id == current_user.id
+        Booking.userId == current_user.id
     ).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
